@@ -13,8 +13,8 @@ WIP
 
 #### 2. Request passing workflow
 
-- new request comes nginx and nginx proxy request to a.example.com
-- a.example.com's worker is processing request
+- new request comes nginx and it proxy request to a.example.com
+- a.example.com's worker process request
 
 <img src="https://cloud.githubusercontent.com/assets/209884/15988268/b46eddbc-3084-11e6-8fe1-f8547a9107c5.png" with="200px" height="200px"/>
 
@@ -23,23 +23,23 @@ WIP
 
 <img src="https://cloud.githubusercontent.com/assets/209884/15988292/8c5e5158-3085-11e6-8fb4-dc1f7aec8dc6.png" with="200px" height="200px"/>
 
-- Similary, other request comes nginx and proxy request to a.example.com
-- a.example.com's server assign other worker for processing new request
+- Similary, other request comes nginx and it proxy request to a.example.com
+- a.example.com's server assign other worker for new request
 
 <img src="https://cloud.githubusercontent.com/assets/209884/15988308/35dc8c04-3086-11e6-8481-78bda6fa6533.png" with="200px" height="200px"/>
 
-- other request comes nginx and proxy request to a.example.com again
-- a.example.com's server assign last worker for processing new request
-- a.example.com's worker becomes full
+- other request comes nginx and it proxy request to a.example.com again
+- a.example.com's server assign last worker for new request
+- a.example.com's workers become full
 
 <img src="https://cloud.githubusercontent.com/assets/209884/15988320/a48498e0-3086-11e6-9609-00f735a0525f.png" with="200px" height="200px"/>
 
-- new request comes nginx and proxy request to a.example.com
+- new request comes nginx and it proxy request to a.example.com
 - Howerver, a.example.com has no worker for processing request
 
 <img src="https://cloud.githubusercontent.com/assets/209884/15988339/55080102-3087-11e6-8775-623b385cd4a4.png" with="200px" height="200px"/>
 
-- If nginx knows a.example.com's left worker number, proxy to b.example.com
+- If nginx knows a.example.com's left worker number, it proxy to b.example.com
 
 <img src="https://cloud.githubusercontent.com/assets/209884/15988341/5da5b4ee-3087-11e6-8471-4faebe627b9f.png" with="200px" height="200px"/>
 
