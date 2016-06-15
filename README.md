@@ -58,8 +58,7 @@ WIP
 
 ## QuickStart
 
-- 1. run two http servers ( http://127.0.0.1:8001 and http://127.0.0.1:8002 )
-- 2. write the following code to nginx.conf
+- 1. write the following code to nginx.conf
 
 ```
 upstream backends {
@@ -90,12 +89,12 @@ server {
 }
 ```
 
-- 3. run nginx
+- 2. run nginx
 ```
 $ nginx -c /path/to/nginx.conf 
 ```
 
-- 4. test request
+- 3. test request
  - default server capacity is 1. Therefore, second request is other server.
 ```
 $ curl http://127.0.0.1:8000 # 8001
