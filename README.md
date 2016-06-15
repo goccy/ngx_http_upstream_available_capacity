@@ -63,7 +63,22 @@ WIP
 
 ```
 upstream backends {
+    server 127.0.0.1:8001;
+    server 127.0.0.1:8002;
     available_capacity;
+}
+
+server {
+    listen 8001;
+    location / {
+        return 200 "8001";
+    }
+}
+server {
+   listen 8002;
+   location / {
+       return 200 "8002";
+   }
 }
 
 server {
@@ -75,28 +90,15 @@ server {
 }
 ```
 
-- 3. add server address and workers to redis by CLI tool
-```
-$ script/nginx-upstream-list add --server 127.0.0.1:8001 --worker 3
-$ script/nginx-upstream-list add --server 127.0.0.1:8002 --worker 3
-```
-
-- 4. run nginx
+- 3. run nginx
 ```
 $ nginx -c /path/to/nginx.conf 
 ```
 
-- 5. test request
+- 4. test request
+ - default server capacity is 1. Therefore, second request is other server.
 ```
-$ curl http://127.0.0.1:8000 # response from 127.0.0.1:8001
-```
-
-- 6. remove workers from 127.0.0.1:8001
-```
-$ script/nginx-upstream-list update --server 127.0.0.1:8001 --worker 0
-```
-
-- 7. test request
-```
-$ curl http://127.0.0.1:8000 # response from 127.0.0.1:8002
+$ curl http://127.0.0.1:8000 # 8001
+$ curl http://127.0.0.1:8000 # 8002
+$ curl http://127.0.0.1:8000 # 500 error
 ```
