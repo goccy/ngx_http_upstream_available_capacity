@@ -2,27 +2,12 @@
  * Copyright (C) 2016 Masaaki Goshima <goccy54@gmail.com>
  */
 
-#include <ngx_config.h>
-#include <ngx_core.h>
-#include <ngx_http.h>
+#include "ngx_http_upstream_available_capacity_module.h"
+
+ngx_http_upstream_available_capacity_srv_conf_t *available_capacity_server_conf = NULL;
 
 static char *ngx_http_upstream_available_capacity(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
 static void *ngx_http_upstream_available_capacity_create_conf(ngx_conf_t *cf);
-
-typedef struct {
-    ngx_http_upstream_server_t *server;
-    ngx_addr_t addr;
-    int capacity;
-} ngx_http_upstream_available_capacity_server_t;
-
-typedef struct {
-    ngx_http_upstream_srv_conf_t *conf;
-} ngx_http_upstream_available_capacity_data_t;
-
-typedef struct {
-    ngx_str_t host;
-    ngx_array_t *servers;
-} ngx_http_upstream_available_capacity_srv_conf_t;
 
 static ngx_command_t ngx_http_upstream_available_capacity_commands[] = {
     { 
@@ -133,6 +118,8 @@ static ngx_int_t ngx_http_upstream_init_available_capacity(ngx_conf_t *cf, ngx_h
         }
         cap_server->addr = addr;
     }
+
+    available_capacity_server_conf = conf;
     return NGX_OK;
 }
 
