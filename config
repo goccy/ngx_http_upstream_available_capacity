@@ -1,14 +1,17 @@
-ngx_addon_name=ngx_http_upstream_available_capacity_module
-
 if test -n "$ngx_module_link"; then
     ngx_module_type=HTTP
-    ngx_module_name=$ngx_addon_name
+    ngx_module_name="ngx_http_upstream_available_capacity_module ngx_http_upstream_capacity_configure_module"
     ngx_module_incs=
     ngx_module_deps=
-    ngx_module_srcs="$ngx_addon_dir/ngx_http_upstream_available_capacity_module.c"
+    ngx_module_srcs="$ngx_addon_dir/ngx_http_upstream_available_capacity_module.c $ngx_addon_dir/ngx_http_upstream_capacity_configure_module.c"
     ngx_module_libs=
    . auto/module
 else
     HTTP_MODULES="$HTTP_MODULES ngx_http_upstream_available_capacity_module"
     NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/ngx_http_upstream_available_capacity_module.c"
+   . auto/module
+
+   HTTP_MODULES="$HTTP_MODULES ngx_http_upstream_capacity_configure_module"
+   NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/ngx_http_upstream_capacity_configure_module.c"
+   . auto/module
 fi
