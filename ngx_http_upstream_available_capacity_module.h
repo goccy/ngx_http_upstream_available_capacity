@@ -5,19 +5,22 @@
 #include <ngx_core.h>
 #include <ngx_http.h>
 
-typedef struct {
+// customized server configuration
+typedef struct _ngx_http_upstream_available_capacity_server_t {
     ngx_http_upstream_server_t *server;
     ngx_addr_t addr;
     int capacity;
+    struct _ngx_http_upstream_available_capacity_server_t *next;
 } ngx_http_upstream_available_capacity_server_t;
 
+// user defined data for sharing between requests
 typedef struct {
     ngx_http_upstream_srv_conf_t *conf;
 } ngx_http_upstream_available_capacity_data_t;
 
+// main configuration for available_capacity
 typedef struct {
-    ngx_str_t host;
-    ngx_array_t *servers;
+    ngx_http_upstream_available_capacity_server_t *server_list;
 } ngx_http_upstream_available_capacity_srv_conf_t;
 
 extern ngx_module_t ngx_http_upstream_available_capacity_module;

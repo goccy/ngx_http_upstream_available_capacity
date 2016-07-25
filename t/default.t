@@ -9,6 +9,7 @@ __DATA__
 === TEST 1: default
 --- http_config
     upstream backends {
+        zone zone_for_available_capacity 1m;
         server 127.0.0.1:8001;
         server 127.0.0.1:8002;
         available_capacity;

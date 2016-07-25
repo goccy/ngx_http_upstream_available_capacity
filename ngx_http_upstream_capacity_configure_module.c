@@ -106,7 +106,6 @@ static ngx_int_t set_capacity_handler(ngx_http_request_t *r, ngx_http_variable_v
 static ngx_http_upstream_capacity_configure_data_t ngx_http_upstream_capacity_configure_table[] = {
     { ngx_string("arg_init"), init_server_capacity_handler   },
     { ngx_string("arg_inc"),  increment_server_capacity_handler },
-
     { ngx_string("arg_cap"),  set_capacity_handler },
 };
 
@@ -114,19 +113,9 @@ static ngx_http_upstream_available_capacity_server_t *find_server_from_config(ng
 {
     ngx_http_upstream_available_capacity_server_t *ret = NULL;
     
-    ngx_addr_t addr;
-    ngx_memzero(&addr, sizeof(ngx_addr_t));
-    
-    if (ngx_parse_addr_port(r->pool, &addr, target_server->data, target_server->len) != NGX_OK) {
-        ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "cannot parse url : %s", target_server->data);
-        return NULL;
-    }
-    
     ngx_http_upstream_available_capacity_srv_conf_t *conf = available_capacity_server_conf;
-    size_t i = 0;
-    for (i = 0; i < conf->servers->nelts; ++i) {
-        ngx_http_upstream_available_capacity_server_t *servers = conf->servers->elts;
-        ngx_http_upstream_available_capacity_server_t *server  = &servers[i];
+    ngx_http_upstream_available_capacity_server_t *server = conf->server_list;
+    for (; server; server = server->next) {
         if (ngx_strncmp(server->server->name.data, target_server->data, server->server->name.len) == 0) {
             ret = server;
             break;
