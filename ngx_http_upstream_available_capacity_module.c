@@ -51,6 +51,8 @@ ngx_module_t ngx_http_upstream_available_capacity_module = {
     NGX_MODULE_V1_PADDING
 };
 
+#define NEXT_SERVER(conf, server) (server->next ? server->next : conf->server_list)
+
 static ngx_int_t ngx_http_upstream_get_available_capacity_peer(ngx_peer_connection_t *pc, void *data)
 {
     ngx_http_upstream_available_capacity_data_t *cap_data = data;
@@ -60,9 +62,12 @@ static ngx_int_t ngx_http_upstream_get_available_capacity_peer(ngx_peer_connecti
 
     ngx_http_upstream_available_capacity_srv_conf_t *conf = ngx_http_conf_upstream_srv_conf(cap_data->conf, ngx_http_upstream_available_capacity_module);
     ngx_http_upstream_available_capacity_server_t *found_server = NULL;
-
-    ngx_http_upstream_available_capacity_server_t *server = conf->server_list;
-    for (; server; server = server->next) {
+    ngx_http_upstream_available_capacity_server_t *server = conf->search_start_peer;
+    size_t i = 0;
+    for (; i < conf->server_num; ++i) {
+        if (i != 0) {
+            server = NEXT_SERVER(conf, server);
+        }
         if (server->capacity > 0) {
             found_server = server;
             ngx_log_debug1(NGX_LOG_DEBUG_HTTP, pc->log, 0, "server_capacity = [%d]\n", server->capacity);
@@ -70,6 +75,7 @@ static ngx_int_t ngx_http_upstream_get_available_capacity_peer(ngx_peer_connecti
             break;
         }
     }
+    conf->search_start_peer = (server == conf->search_start_peer) ? NEXT_SERVER(conf, server) : server;
 
     if (found_server) {
         pc->sockaddr = found_server->addr.sockaddr;
@@ -110,7 +116,7 @@ static ngx_int_t setup_default_servers(ngx_http_request_t *r, ngx_http_upstream_
         ngx_cpystrn(url.url.data, server_address.data, server_address_size + 1);
 
         if (ngx_parse_url_slab(shpool, &url) != NGX_OK) {
-            ngx_conf_log_error(NGX_LOG_ERR, r->connection->log, 0, "cannot parse url : %s", server_address.data);
+            ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "cannot parse url : %s", server_address.data);
             return NGX_DECLINED;
         }
         server_conf->addr = *url.addrs;
@@ -123,6 +129,9 @@ static ngx_int_t setup_default_servers(ngx_http_request_t *r, ngx_http_upstream_
         }
         prev_server_conf = server_conf;
     }
+
+    conf->server_num        = us->servers->nelts;
+    conf->search_start_peer = conf->server_list;
 
     ngx_shmtx_unlock(&shpool->mutex);
     return NGX_OK;
@@ -155,12 +164,7 @@ static ngx_int_t ngx_http_upstream_init_available_capacity(ngx_conf_t *cf, ngx_h
 
 static void *ngx_http_upstream_available_capacity_create_conf(ngx_conf_t *cf)
 {
-    ngx_http_upstream_available_capacity_srv_conf_t  *conf;
-    conf = ngx_palloc(cf->pool, sizeof(ngx_http_upstream_available_capacity_srv_conf_t));
-    if (conf == NULL) {
-        return NULL;
-    }
-    return conf;
+    return ngx_pcalloc(cf->pool, sizeof(ngx_http_upstream_available_capacity_srv_conf_t));
 }
  
 static char *ngx_http_upstream_available_capacity(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)

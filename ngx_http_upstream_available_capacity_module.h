@@ -20,6 +20,8 @@ typedef struct {
 
 // main configuration for available_capacity
 typedef struct {
+    size_t server_num;
+    ngx_http_upstream_available_capacity_server_t *search_start_peer;
     ngx_http_upstream_available_capacity_server_t *server_list;
 } ngx_http_upstream_available_capacity_srv_conf_t;
 
