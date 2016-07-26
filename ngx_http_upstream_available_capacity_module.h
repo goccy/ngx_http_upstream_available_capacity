@@ -20,6 +20,7 @@ typedef struct {
 
 // main configuration for available_capacity
 typedef struct {
+    ngx_url_t redis_pass;
     size_t server_num;
     ngx_http_upstream_available_capacity_server_t *search_start_peer;
     ngx_http_upstream_available_capacity_server_t *server_list;

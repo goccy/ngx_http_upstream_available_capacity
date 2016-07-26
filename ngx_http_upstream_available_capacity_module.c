@@ -8,14 +8,15 @@
 ngx_http_upstream_available_capacity_srv_conf_t *available_capacity_server_conf = NULL;
 
 static char *ngx_http_upstream_available_capacity(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
+static char *ngx_http_upstream_available_capacity_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
 static void *ngx_http_upstream_available_capacity_create_conf(ngx_conf_t *cf);
 
 static ngx_command_t ngx_http_upstream_available_capacity_commands[] = {
     { 
         ngx_string("available_capacity"),
-        NGX_HTTP_UPS_CONF|NGX_CONF_NOARGS,
+        NGX_HTTP_UPS_CONF|NGX_CONF_NOARGS|NGX_CONF_TAKE1,
         ngx_http_upstream_available_capacity,
-        0,
+        NGX_HTTP_SRV_CONF_OFFSET,
         0,
         NULL
     },
@@ -166,14 +167,34 @@ static void *ngx_http_upstream_available_capacity_create_conf(ngx_conf_t *cf)
 {
     return ngx_pcalloc(cf->pool, sizeof(ngx_http_upstream_available_capacity_srv_conf_t));
 }
- 
+
+static ngx_int_t ngx_http_upstream_available_capacity_support_redis(ngx_conf_t *cf, ngx_str_t *redis_pass, ngx_http_upstream_available_capacity_srv_conf_t *conf)
+{
+    ngx_url_t url;
+    ngx_memzero(&url, sizeof(ngx_url_t));
+    url.url = *redis_pass;
+    url.default_port = 80;
+    if (ngx_parse_url(cf->pool, &url) != NGX_OK) {
+        ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, "cannot parse url : %V", &url.url);
+        return NGX_ERROR;
+    }
+    conf->redis_pass = url;
+    return NGX_OK;
+}
+
 static char *ngx_http_upstream_available_capacity(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
     ngx_http_upstream_srv_conf_t *uscf = ngx_http_conf_get_module_srv_conf(cf, ngx_http_upstream_module);
     if (uscf->peer.init_upstream) {
         ngx_conf_log_error(NGX_LOG_WARN, cf, 0, "load balancing method redefined");
     }
-
+    if (cf->args->nelts == 2) {
+        ngx_str_t *args = cf->args->elts;
+        if (ngx_http_upstream_available_capacity_support_redis(cf, &args[1], conf) != NGX_OK) {
+            return NGX_CONF_ERROR;
+        }
+    }
+    
     uscf->peer.init_upstream = ngx_http_upstream_init_available_capacity;
     return NGX_CONF_OK;
 }
