@@ -12,7 +12,7 @@ static char *ngx_http_upstream_available_capacity_block(ngx_conf_t *cf, ngx_comm
 static void *ngx_http_upstream_available_capacity_create_conf(ngx_conf_t *cf);
 
 static ngx_command_t ngx_http_upstream_available_capacity_commands[] = {
-    { 
+    {
         ngx_string("available_capacity"),
         NGX_HTTP_UPS_CONF|NGX_CONF_NOARGS|NGX_CONF_TAKE1,
         ngx_http_upstream_available_capacity,
@@ -26,7 +26,7 @@ static ngx_command_t ngx_http_upstream_available_capacity_commands[] = {
 static ngx_http_module_t ngx_http_upstream_available_capacity_module_ctx = {
     NULL,                                             /* preconfiguration */
     NULL,                                             /* postconfiguration */
-    
+
     NULL,                                             /* create main configuration */
     NULL,                                             /* init main configuration */
 
@@ -94,12 +94,12 @@ static ngx_int_t setup_default_servers(ngx_http_request_t *r, ngx_http_upstream_
 {
     ngx_http_upstream_available_capacity_srv_conf_t *conf = ngx_http_conf_upstream_srv_conf(us, ngx_http_upstream_available_capacity_module);
     if (conf->server_list) return NGX_OK;
-    
+
     ngx_slab_pool_t *shpool = (ngx_slab_pool_t *)us->shm_zone->shm.addr;
     ngx_shmtx_lock(&shpool->mutex);
 
     ngx_http_upstream_available_capacity_server_t *prev_server_conf = NULL;
-	size_t i = 0;
+    size_t i = 0;
     for (i = 0; i < us->servers->nelts; ++i) {
         ngx_http_upstream_server_t *servers = us->servers->elts;
 
@@ -156,7 +156,7 @@ static ngx_int_t ngx_http_upstream_init_available_capacity(ngx_conf_t *cf, ngx_h
     if (ngx_http_upstream_init_round_robin(cf, us) != NGX_OK) {
         return NGX_ERROR;
     }
-    
+
     us->peer.init = ngx_http_upstream_init_available_capacity_peer;
     ngx_http_upstream_available_capacity_srv_conf_t *conf = ngx_http_conf_upstream_srv_conf(us, ngx_http_upstream_available_capacity_module);
     available_capacity_server_conf = conf;
@@ -194,7 +194,7 @@ static char *ngx_http_upstream_available_capacity(ngx_conf_t *cf, ngx_command_t 
             return NGX_CONF_ERROR;
         }
     }
-    
+
     uscf->peer.init_upstream = ngx_http_upstream_init_available_capacity;
     return NGX_CONF_OK;
 }
