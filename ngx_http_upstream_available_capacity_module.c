@@ -179,6 +179,7 @@ static ngx_int_t ngx_http_upstream_available_capacity_support_redis(ngx_conf_t *
         return NGX_ERROR;
     }
     conf->redis_pass = url;
+    conf->redis_ctx  = picoredis_connect_with_address((char *)url.host.data);
     return NGX_OK;
 }
 

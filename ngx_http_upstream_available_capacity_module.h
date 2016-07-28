@@ -4,6 +4,7 @@
 #include <ngx_config.h>
 #include <ngx_core.h>
 #include <ngx_http.h>
+#include "picoredis.h"
 
 // customized server configuration
 typedef struct _ngx_http_upstream_available_capacity_server_t {
@@ -20,6 +21,7 @@ typedef struct {
 
 // main configuration for available_capacity
 typedef struct {
+    picoredis_t *redis_ctx;
     ngx_url_t redis_pass;
     size_t server_num;
     ngx_http_upstream_available_capacity_server_t *search_start_peer;

@@ -2,6 +2,7 @@
 #include <ngx_config.h>
 #include <ngx_core.h>
 #include <ngx_http.h>
+#include "picoredis.h"
 
 static char *ngx_http_upstream_capacity_configure(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
 
